@@ -12,7 +12,7 @@ public class FileManager {
     public static boolean saveUser(User user, String fileName) {
         try (FileWriter writer = new FileWriter(fileName, true)) {
             writer.write("Username: " + user.getUsername() + "\n");
-            writer.write("Password: " + user.getPassword() + "\n");
+            writer.write("Password: " + user.getPassword() + "\n");  // Save as plain text for now
             writer.write("Full Name: " + user.getFullName() + "\n");
             writer.write("Email: " + user.getEmail() + "\n");
             writer.write("Phone: " + user.getPhone() + "\n");
@@ -24,8 +24,12 @@ public class FileManager {
             }
             
             writer.write("------------------------\n");
+            
+            // Debug output
+            System.out.println("Saved user to " + fileName + ": " + user.getUsername());
             return true;
         } catch (IOException e) {
+            System.out.println("Error saving user: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -44,6 +48,8 @@ public class FileManager {
             }
         }
         
+        System.out.println("Authenticating user: " + username + " in file: " + fileName);
+        
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             
@@ -58,24 +64,13 @@ public class FileManager {
                     
                     String filePassword = passwordLine.substring(10).trim();
                     
-                    System.out.println("Checking user: " + fileUsername + " against: " + username);
+                    System.out.println("Found user: " + fileUsername + " with password: " + filePassword);
                     
                     if (fileUsername.equals(username)) {
-                        // Try both hashed and plain text password verification
-                        boolean passwordMatch = false;
-                        
-                        // First try hashed password verification
-                        if (PasswordUtils.verifyPassword(password, filePassword)) {
-                            passwordMatch = true;
-                            System.out.println("Password matched (hashed)");
-                        }
-                        // If hashed doesn't work, try plain text (for backward compatibility)
-                        else if (password.equals(filePassword)) {
-                            passwordMatch = true;
-                            System.out.println("Password matched (plain text)");
-                        }
-                        
-                        if (passwordMatch) {
+                        // For now, use simple plain text comparison
+                        if (password.equals(filePassword)) {
+                            System.out.println("Password matched for user: " + username);
+                            
                             // Read the rest of user data
                             String fullNameLine = reader.readLine();
                             String emailLine = reader.readLine();
@@ -83,6 +78,7 @@ public class FileManager {
                             String roleLine = reader.readLine();
                             
                             if (fullNameLine == null || emailLine == null || phoneLine == null || roleLine == null) {
+                                System.out.println("Incomplete user data for: " + username);
                                 continue;
                             }
                             
@@ -105,7 +101,11 @@ public class FileManager {
                                 }
                             }
                             
+                            System.out.println("Successfully authenticated user: " + username);
                             return user;
+                        } else {
+                            System.out.println("Password mismatch for user: " + username);
+                            System.out.println("Expected: " + filePassword + ", Got: " + password);
                         }
                     }
                 }
@@ -114,12 +114,19 @@ public class FileManager {
             System.out.println("Error reading file " + fileName + ": " + e.getMessage());
             e.printStackTrace();
         }
+        
+        System.out.println("Authentication failed for user: " + username);
         return null;
     }
     
     public static boolean userExists(String username) {
-        return getUserByUsername(username, "tourists.txt") != null || 
-               getUserByUsername(username, "guides.txt") != null;
+        boolean existsInTourists = getUserByUsername(username, "tourists.txt") != null;
+        boolean existsInGuides = getUserByUsername(username, "guides.txt") != null;
+        
+        System.out.println("Checking if user exists: " + username + 
+                          " (Tourists: " + existsInTourists + ", Guides: " + existsInGuides + ")");
+        
+        return existsInTourists || existsInGuides;
     }
     
     public static User getUserByUsername(String username, String fileName) {
