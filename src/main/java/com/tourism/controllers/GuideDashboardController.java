@@ -7,8 +7,12 @@ import com.tourism.utils.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import java.util.List;
 
 public class GuideDashboardController {
@@ -55,13 +59,12 @@ public class GuideDashboardController {
     private void loadGuideData() {
         User guide = FileManager.getUserByUsername(username, "guides.txt");
         if (guide != null) {
-            welcomeLabel.setText(languageManager.getText("welcome") + ", " + guide.getFullName() + "!");
-            languagesLabel.setText(languageManager.getText("languages") + ": " + guide.getLanguages());
-            experienceLabel.setText(languageManager.getText("experience") + ": " + guide.getExperience());
+            welcomeLabel.setText("Welcome, " + guide.getFullName() + "!");
+            languagesLabel.setText("Languages: " + guide.getLanguages());
+            experienceLabel.setText("Experience: " + guide.getExperience());
             
-            // Calculate earnings (10-15% commission)
             double totalEarnings = calculateEarnings();
-            earningsLabel.setText(languageManager.getText("earnings") + ": $" + String.format("%.2f", totalEarnings));
+            earningsLabel.setText("Earnings: $" + String.format("%.2f", totalEarnings));
         }
     }
     
@@ -73,13 +76,13 @@ public class GuideDashboardController {
     
     private void loadImportantUpdates() {
         StringBuilder updates = new StringBuilder();
-        updates.append(languageManager.getText("weather.alert")).append("\n");
-        updates.append("• ").append(languageManager.getText("heavy.snow.everest")).append("\n");
-        updates.append("• ").append(languageManager.getText("clear.weather.annapurna")).append("\n\n");
+        updates.append("Weather Alerts:\n");
+        updates.append("• Heavy snow expected on Everest trek routes\n");
+        updates.append("• Clear weather conditions in Annapurna region\n\n");
         
-        updates.append(languageManager.getText("emergency.notices")).append("\n");
-        updates.append("• ").append(languageManager.getText("rescue.helicopter.available")).append("\n");
-        updates.append("• ").append(languageManager.getText("medical.checkup.required")).append("\n");
+        updates.append("Emergency Notices:\n");
+        updates.append("• Rescue helicopter services available 24/7\n");
+        updates.append("• Medical checkup required for high altitude treks\n");
         
         updatesArea.setText(updates.toString());
     }
@@ -89,8 +92,7 @@ public class GuideDashboardController {
         double totalEarnings = 0.0;
         
         for (Booking booking : guideBookings) {
-            // 12% commission on each booking
-            totalEarnings += booking.getPrice() * 0.12;
+            totalEarnings += booking.getPrice() * 0.12; // 12% commission
         }
         
         return totalEarnings;
@@ -99,10 +101,9 @@ public class GuideDashboardController {
     @FXML
     private void handleLogout() {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/fxml/login.fxml"));
-            javafx.scene.Parent root = loader.load();
-            javafx.stage.Stage stage = (javafx.stage.Stage) logoutButton.getScene().getWindow();
-            stage.setScene(new javafx.scene.Scene(root, 800, 600));
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.setScene(new Scene(root, 800, 600));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -112,12 +113,12 @@ public class GuideDashboardController {
     private void toggleLanguage() {
         languageManager.toggleLanguage();
         updateLanguage();
-        loadGuideData(); // Reload to update language-dependent content
+        loadGuideData();
         loadImportantUpdates();
     }
     
     private void updateLanguage() {
-        logoutButton.setText(languageManager.getText("logout.button"));
+        logoutButton.setText("Logout");
         languageToggle.setText(languageManager.getCurrentLanguage().equals("EN") ? "नेपाली" : "English");
     }
 }
