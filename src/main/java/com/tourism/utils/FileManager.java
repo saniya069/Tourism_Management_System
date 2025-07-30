@@ -107,11 +107,6 @@ public class FileManager {
                     }
                 }
             }
-          {
-                        users.add(user);
-                    }
-                }
-            }
         } catch (IOException e) {
             System.err.println("Error loading users: " + e.getMessage());
         }
