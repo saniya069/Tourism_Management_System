@@ -36,15 +36,16 @@ public class LoginController {
     @FXML
     private void handleLogin() {
         String username = usernameField.getText().trim();
-        String password = passwordField.getText();
+        String password = passwordField.getText().trim(); // Add trim() to remove spaces
         
         if (username.isEmpty() || password.isEmpty()) {
             showError(languageManager.getText("error.empty.fields"));
             return;
         }
         
-        // Debug: Print login attempt
-        System.out.println("Login attempt - Username: " + username + ", Password length: " + password.length());
+        // Debug: Print login attempt with character codes
+        System.out.println("Login attempt - Username: '" + username + "', Password: '" + password + "'");
+        System.out.println("Password length: " + password.length());
         
         // Check admin credentials (plain text comparison for admin)
         if (username.equals("saniya") && password.equals("saniya123")) {
@@ -81,6 +82,7 @@ public class LoginController {
             stage.setScene(new Scene(root, 800, 600));
         } catch (IOException e) {
             e.printStackTrace();
+            showError("Error loading registration page: " + e.getMessage());
         }
     }
     
@@ -101,7 +103,16 @@ public class LoginController {
     
     private void openDashboard(String role, String username) {
         try {
-            String fxmlFile = "/fxml/" + role + "_dashboard.fxml";
+            String fxmlFile = "/fxml/" + role + "-dashboard.fxml"; // Use hyphen instead of underscore
+            System.out.println("Attempting to load FXML file: " + fxmlFile);
+            
+            // Check if resource exists
+            if (getClass().getResource(fxmlFile) == null) {
+                System.out.println("FXML file not found: " + fxmlFile);
+                showError("Dashboard file not found: " + fxmlFile);
+                return;
+            }
+            
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root = loader.load();
             
@@ -119,8 +130,11 @@ public class LoginController {
             
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(new Scene(root, 1200, 800));
+            stage.setTitle("Nepal Tourism Management System - " + role.substring(0, 1).toUpperCase() + role.substring(1) + " Dashboard");
+            
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Error loading dashboard: " + e.getMessage());
             showError("Error loading dashboard: " + e.getMessage());
         }
     }
