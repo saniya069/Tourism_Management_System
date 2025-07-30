@@ -28,6 +28,14 @@ public class Attraction {
     
     @Override
     public String toString() {
-        return name + " (" + altitude + " Altitude, " + difficulty + ")";
+        return name + "," + altitude + "," + difficulty + "," + basePrice;
+    }
+    
+    public static Attraction fromString(String line) {
+        String[] parts = line.split(",", 4);
+        if (parts.length == 4) {
+            return new Attraction(parts[0], parts[1], parts[2], Double.parseDouble(parts[3]));
+        }
+        return null;
     }
 }
