@@ -1,0 +1,46 @@
+package com.tourism.controllers;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import com.tourism.models.User;
+
+public class TouristDashboardControllerSimple {
+    
+    @FXML private Label welcomeLabel;
+    @FXML private Button logoutButton;
+    @FXML private TableView bookingsTable;
+    @FXML private TableColumn bookingIdColumn;
+    @FXML private TableColumn attractionColumn;
+    
+    private User currentUser;
+    
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+        if (welcomeLabel != null) {
+            welcomeLabel.setText("Welcome, " + user.getFullName() + "!");
+        }
+        System.out.println("Simple controller initialized for: " + user.getUsername());
+    }
+    
+    @FXML
+    private void initialize() {
+        System.out.println("Simple TouristDashboardController initialize() called");
+    }
+    
+    @FXML
+    private void handleLogout() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+            Parent root = loader.load();
+            
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (Exception e) {
+            System.err.println("Error logging out: " + e.getMessage());
+        }
+    }
+}
