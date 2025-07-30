@@ -100,7 +100,7 @@ public class LoginController {
                     fxmlFile = "/fxml/admin-dashboard.fxml";
                     break;
                 case "tourist":
-                    fxmlFile = "/fxml/tourist-dashboard.fxml";
+                    fxmlFile = "/fxml/tourist-dashboard.fxml"; // Updated FXML file path
                     break;
                 case "guide":
                     fxmlFile = "/fxml/guide-dashboard.fxml";
