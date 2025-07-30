@@ -2,7 +2,6 @@ package com.tourism.controllers;
 
 import com.tourism.models.User;
 import com.tourism.utils.FileManager;
-import com.tourism.utils.PasswordUtils;
 import com.tourism.utils.LanguageManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -54,13 +53,11 @@ public class RegisterController {
         String phone = phoneField.getText().trim();
         String role = roleComboBox.getValue();
         
-        // Check if username already exists
         if (FileManager.userExists(username)) {
-            showError(languageManager.getText("error.username.exists"));
+            showError("Username already exists!");
             return;
         }
         
-        // Create user with PLAIN TEXT password for now (to avoid hashing issues)
         User user = new User(username, password, fullName, email, phone, role);
         
         if (role.equals("Guide")) {
@@ -70,13 +67,11 @@ public class RegisterController {
         
         String fileName = role.equals("Tourist") ? "tourists.txt" : "guides.txt";
         
-        // Debug output
         System.out.println("Registering user: " + username + " with password: " + password + " in file: " + fileName);
         
         if (FileManager.saveUser(user, fileName)) {
-            showSuccess(languageManager.getText("success.registration"));
+            showSuccess("Registration successful!");
             
-            // Show registration details
             Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
             infoAlert.setTitle("Registration Successful");
             infoAlert.setHeaderText("Account Created Successfully!");
@@ -84,11 +79,10 @@ public class RegisterController {
                                    "\n\nYou can now login with these credentials.");
             infoAlert.showAndWait();
             
-            // Clear fields and go back to login
             clearFields();
             goBack();
         } else {
-            showError(languageManager.getText("error.registration.failed"));
+            showError("Registration failed!");
         }
     }
     
@@ -132,18 +126,16 @@ public class RegisterController {
             phoneField.getText().trim().isEmpty() ||
             roleComboBox.getValue() == null) {
             
-            showError(languageManager.getText("error.empty.fields"));
+            showError("Please fill in all required fields!");
             return false;
         }
         
-        // Username validation
         String username = usernameField.getText().trim();
         if (username.length() < 3) {
             showError("Username must be at least 3 characters long!");
             return false;
         }
         
-        // Password validation
         String password = passwordField.getText();
         if (password.length() < 3) {
             showError("Password must be at least 3 characters long!");
@@ -153,7 +145,7 @@ public class RegisterController {
         if ("Guide".equals(roleComboBox.getValue())) {
             if (languagesField.getText().trim().isEmpty() ||
                 experienceField.getText().trim().isEmpty()) {
-                showError(languageManager.getText("error.guide.fields.required"));
+                showError("Languages and experience are required for guides!");
                 return false;
             }
         }
