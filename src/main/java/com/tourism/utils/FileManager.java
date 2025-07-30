@@ -32,35 +32,86 @@ public class FileManager {
     }
     
     public static User authenticateUser(String username, String password, String fileName) {
+        // Create file if it doesn't exist
+        File file = new File(fileName);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+                System.out.println("Created new file: " + fileName);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
-            User user = null;
             
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("Username: ")) {
-                    String fileUsername = line.substring(10);
-                    String filePassword = reader.readLine().substring(10);
+                    String fileUsername = line.substring(10).trim();
+                    String passwordLine = reader.readLine();
                     
-                    if (fileUsername.equals(username) && PasswordUtils.verifyPassword(password, filePassword)) {
-                        String fullName = reader.readLine().substring(11);
-                        String email = reader.readLine().substring(7);
-                        String phone = reader.readLine().substring(7);
-                        String role = reader.readLine().substring(6);
+                    if (passwordLine == null || !passwordLine.startsWith("Password: ")) {
+                        continue;
+                    }
+                    
+                    String filePassword = passwordLine.substring(10).trim();
+                    
+                    System.out.println("Checking user: " + fileUsername + " against: " + username);
+                    
+                    if (fileUsername.equals(username)) {
+                        // Try both hashed and plain text password verification
+                        boolean passwordMatch = false;
                         
-                        user = new User(fileUsername, filePassword, fullName, email, phone, role);
-                        
-                        if ("Guide".equals(role)) {
-                            String languages = reader.readLine().substring(11);
-                            String experience = reader.readLine().substring(12);
-                            user.setLanguages(languages);
-                            user.setExperience(experience);
+                        // First try hashed password verification
+                        if (PasswordUtils.verifyPassword(password, filePassword)) {
+                            passwordMatch = true;
+                            System.out.println("Password matched (hashed)");
+                        }
+                        // If hashed doesn't work, try plain text (for backward compatibility)
+                        else if (password.equals(filePassword)) {
+                            passwordMatch = true;
+                            System.out.println("Password matched (plain text)");
                         }
                         
-                        return user;
+                        if (passwordMatch) {
+                            // Read the rest of user data
+                            String fullNameLine = reader.readLine();
+                            String emailLine = reader.readLine();
+                            String phoneLine = reader.readLine();
+                            String roleLine = reader.readLine();
+                            
+                            if (fullNameLine == null || emailLine == null || phoneLine == null || roleLine == null) {
+                                continue;
+                            }
+                            
+                            String fullName = fullNameLine.startsWith("Full Name: ") ? fullNameLine.substring(11).trim() : "";
+                            String email = emailLine.startsWith("Email: ") ? emailLine.substring(7).trim() : "";
+                            String phone = phoneLine.startsWith("Phone: ") ? phoneLine.substring(7).trim() : "";
+                            String role = roleLine.startsWith("Role: ") ? roleLine.substring(6).trim() : "";
+                            
+                            User user = new User(fileUsername, filePassword, fullName, email, phone, role);
+                            
+                            if ("Guide".equals(role)) {
+                                String languagesLine = reader.readLine();
+                                String experienceLine = reader.readLine();
+                                
+                                if (languagesLine != null && experienceLine != null) {
+                                    String languages = languagesLine.startsWith("Languages: ") ? languagesLine.substring(11).trim() : "";
+                                    String experience = experienceLine.startsWith("Experience: ") ? experienceLine.substring(12).trim() : "";
+                                    user.setLanguages(languages);
+                                    user.setExperience(experience);
+                                }
+                            }
+                            
+                            return user;
+                        }
                     }
                 }
             }
         } catch (IOException e) {
+            System.out.println("Error reading file " + fileName + ": " + e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -72,27 +123,48 @@ public class FileManager {
     }
     
     public static User getUserByUsername(String username, String fileName) {
+        File file = new File(fileName);
+        if (!file.exists()) {
+            return null;
+        }
+        
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("Username: ")) {
-                    String fileUsername = line.substring(10);
+                    String fileUsername = line.substring(10).trim();
                     
                     if (fileUsername.equals(username)) {
-                        String password = reader.readLine().substring(10);
-                        String fullName = reader.readLine().substring(11);
-                        String email = reader.readLine().substring(7);
-                        String phone = reader.readLine().substring(7);
-                        String role = reader.readLine().substring(6);
+                        String passwordLine = reader.readLine();
+                        String fullNameLine = reader.readLine();
+                        String emailLine = reader.readLine();
+                        String phoneLine = reader.readLine();
+                        String roleLine = reader.readLine();
+                        
+                        if (passwordLine == null || fullNameLine == null || emailLine == null || 
+                            phoneLine == null || roleLine == null) {
+                            continue;
+                        }
+                        
+                        String password = passwordLine.startsWith("Password: ") ? passwordLine.substring(10).trim() : "";
+                        String fullName = fullNameLine.startsWith("Full Name: ") ? fullNameLine.substring(11).trim() : "";
+                        String email = emailLine.startsWith("Email: ") ? emailLine.substring(7).trim() : "";
+                        String phone = phoneLine.startsWith("Phone: ") ? phoneLine.substring(7).trim() : "";
+                        String role = roleLine.startsWith("Role: ") ? roleLine.substring(6).trim() : "";
                         
                         User user = new User(fileUsername, password, fullName, email, phone, role);
                         
                         if ("Guide".equals(role)) {
-                            String languages = reader.readLine().substring(11);
-                            String experience = reader.readLine().substring(12);
-                            user.setLanguages(languages);
-                            user.setExperience(experience);
+                            String languagesLine = reader.readLine();
+                            String experienceLine = reader.readLine();
+                            
+                            if (languagesLine != null && experienceLine != null) {
+                                String languages = languagesLine.startsWith("Languages: ") ? languagesLine.substring(11).trim() : "";
+                                String experience = experienceLine.startsWith("Experience: ") ? experienceLine.substring(12).trim() : "";
+                                user.setLanguages(languages);
+                                user.setExperience(experience);
+                            }
                         }
                         
                         return user;
@@ -103,6 +175,37 @@ public class FileManager {
             e.printStackTrace();
         }
         return null;
+    }
+    
+    // Initialize with sample data if files don't exist
+    public static void initializeSampleData() {
+        // Create sample tourist
+        File touristFile = new File("tourists.txt");
+        if (!touristFile.exists() || touristFile.length() == 0) {
+            User sampleTourist = new User("tourist1", "password123", "John Doe", "john@example.com", "+977-1234567890", "Tourist");
+            saveUser(sampleTourist, "tourists.txt");
+            System.out.println("Created sample tourist: tourist1/password123");
+        }
+        
+        // Create sample guide
+        File guideFile = new File("guides.txt");
+        if (!guideFile.exists() || guideFile.length() == 0) {
+            User sampleGuide = new User("guide1", "password123", "Ram Sharma", "ram@example.com", "+977-9876543210", "Guide");
+            sampleGuide.setLanguages("English, Nepali");
+            sampleGuide.setExperience("5 years");
+            saveUser(sampleGuide, "guides.txt");
+            System.out.println("Created sample guide: guide1/password123");
+        }
+        
+        // Create sample attractions
+        File attractionFile = new File("attractions.txt");
+        if (!attractionFile.exists() || attractionFile.length() == 0) {
+            saveAttraction(new Attraction("Everest Base Camp", "High", "Hard", 1500.0));
+            saveAttraction(new Attraction("Annapurna Circuit", "High", "Medium", 1200.0));
+            saveAttraction(new Attraction("Chitwan National Park", "Low", "Easy", 800.0));
+            saveAttraction(new Attraction("Pokhara Lake", "Low", "Easy", 600.0));
+            System.out.println("Created sample attractions");
+        }
     }
     
     public static boolean saveAttraction(Attraction attraction) {
@@ -122,21 +225,37 @@ public class FileManager {
     public static List<Attraction> loadAttractions() {
         List<Attraction> attractions = new ArrayList<>();
         
+        File file = new File("attractions.txt");
+        if (!file.exists()) {
+            return attractions;
+        }
+        
         try (BufferedReader reader = new BufferedReader(new FileReader("attractions.txt"))) {
             String line;
             
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("Name: ")) {
-                    String name = line.substring(6);
-                    String altitude = reader.readLine().substring(10);
-                    String difficulty = reader.readLine().substring(12);
-                    double basePrice = Double.parseDouble(reader.readLine().substring(12));
+                    String name = line.substring(6).trim();
+                    String altitudeLine = reader.readLine();
+                    String difficultyLine = reader.readLine();
+                    String priceLine = reader.readLine();
                     
-                    attractions.add(new Attraction(name, altitude, difficulty, basePrice));
+                    if (altitudeLine != null && difficultyLine != null && priceLine != null) {
+                        String altitude = altitudeLine.startsWith("Altitude: ") ? altitudeLine.substring(10).trim() : "";
+                        String difficulty = difficultyLine.startsWith("Difficulty: ") ? difficultyLine.substring(12).trim() : "";
+                        String priceStr = priceLine.startsWith("Base Price: ") ? priceLine.substring(12).trim() : "0";
+                        
+                        try {
+                            double basePrice = Double.parseDouble(priceStr);
+                            attractions.add(new Attraction(name, altitude, difficulty, basePrice));
+                        } catch (NumberFormatException e) {
+                            System.out.println("Error parsing price for attraction: " + name);
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
-            // File might not exist yet, return empty list
+            e.printStackTrace();
         }
         
         return attractions;
@@ -170,27 +289,51 @@ public class FileManager {
     public static List<Booking> loadUserBookings(String username) {
         List<Booking> bookings = new ArrayList<>();
         
+        File file = new File("bookings.txt");
+        if (!file.exists()) {
+            return bookings;
+        }
+        
         try (BufferedReader reader = new BufferedReader(new FileReader("bookings.txt"))) {
             String line;
             
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("Booking ID: ")) {
-                    String bookingId = line.substring(12);
-                    String tourist = reader.readLine().substring(9);
+                    String bookingId = line.substring(12).trim();
+                    String touristLine = reader.readLine();
                     
-                    if (tourist.equals(username)) {
-                        String attraction = reader.readLine().substring(12);
-                        String date = reader.readLine().substring(6);
-                        String difficulty = reader.readLine().substring(12);
-                        double price = Double.parseDouble(reader.readLine().substring(7));
-                        String status = reader.readLine().substring(8);
+                    if (touristLine != null && touristLine.startsWith("Tourist: ")) {
+                        String tourist = touristLine.substring(9).trim();
                         
-                        bookings.add(new Booking(bookingId, tourist, attraction, date, difficulty, price, status));
+                        if (tourist.equals(username)) {
+                            String attractionLine = reader.readLine();
+                            String dateLine = reader.readLine();
+                            String difficultyLine = reader.readLine();
+                            String priceLine = reader.readLine();
+                            String statusLine = reader.readLine();
+                            
+                            if (attractionLine != null && dateLine != null && difficultyLine != null && 
+                                priceLine != null && statusLine != null) {
+                                
+                                String attraction = attractionLine.startsWith("Attraction: ") ? attractionLine.substring(12).trim() : "";
+                                String date = dateLine.startsWith("Date: ") ? dateLine.substring(6).trim() : "";
+                                String difficulty = difficultyLine.startsWith("Difficulty: ") ? difficultyLine.substring(12).trim() : "";
+                                String priceStr = priceLine.startsWith("Price: ") ? priceLine.substring(7).trim() : "0";
+                                String status = statusLine.startsWith("Status: ") ? statusLine.substring(8).trim() : "";
+                                
+                                try {
+                                    double price = Double.parseDouble(priceStr);
+                                    bookings.add(new Booking(bookingId, tourist, attraction, date, difficulty, price, status));
+                                } catch (NumberFormatException e) {
+                                    System.out.println("Error parsing price for booking: " + bookingId);
+                                }
+                            }
+                        }
                     }
                 }
             }
         } catch (IOException e) {
-            // File might not exist yet
+            e.printStackTrace();
         }
         
         return bookings;
@@ -199,24 +342,45 @@ public class FileManager {
     public static List<Booking> loadAllBookings() {
         List<Booking> bookings = new ArrayList<>();
         
+        File file = new File("bookings.txt");
+        if (!file.exists()) {
+            return bookings;
+        }
+        
         try (BufferedReader reader = new BufferedReader(new FileReader("bookings.txt"))) {
             String line;
             
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("Booking ID: ")) {
-                    String bookingId = line.substring(12);
-                    String tourist = reader.readLine().substring(9);
-                    String attraction = reader.readLine().substring(12);
-                    String date = reader.readLine().substring(6);
-                    String difficulty = reader.readLine().substring(12);
-                    double price = Double.parseDouble(reader.readLine().substring(7));
-                    String status = reader.readLine().substring(8);
+                    String bookingId = line.substring(12).trim();
+                    String touristLine = reader.readLine();
+                    String attractionLine = reader.readLine();
+                    String dateLine = reader.readLine();
+                    String difficultyLine = reader.readLine();
+                    String priceLine = reader.readLine();
+                    String statusLine = reader.readLine();
                     
-                    bookings.add(new Booking(bookingId, tourist, attraction, date, difficulty, price, status));
+                    if (touristLine != null && attractionLine != null && dateLine != null && 
+                        difficultyLine != null && priceLine != null && statusLine != null) {
+                        
+                        String tourist = touristLine.startsWith("Tourist: ") ? touristLine.substring(9).trim() : "";
+                        String attraction = attractionLine.startsWith("Attraction: ") ? attractionLine.substring(12).trim() : "";
+                        String date = dateLine.startsWith("Date: ") ? dateLine.substring(6).trim() : "";
+                        String difficulty = difficultyLine.startsWith("Difficulty: ") ? difficultyLine.substring(12).trim() : "";
+                        String priceStr = priceLine.startsWith("Price: ") ? priceLine.substring(7).trim() : "0";
+                        String status = statusLine.startsWith("Status: ") ? statusLine.substring(8).trim() : "";
+                        
+                        try {
+                            double price = Double.parseDouble(priceStr);
+                            bookings.add(new Booking(bookingId, tourist, attraction, date, difficulty, price, status));
+                        } catch (NumberFormatException e) {
+                            System.out.println("Error parsing price for booking: " + bookingId);
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
-            // File might not exist yet
+            e.printStackTrace();
         }
         
         return bookings;
@@ -239,28 +403,45 @@ public class FileManager {
     public static List<User> loadGuides() {
         List<User> guides = new ArrayList<>();
         
+        File file = new File("guides.txt");
+        if (!file.exists()) {
+            return guides;
+        }
+        
         try (BufferedReader reader = new BufferedReader(new FileReader("guides.txt"))) {
             String line;
             
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("Username: ")) {
-                    String username = line.substring(10);
-                    String password = reader.readLine().substring(10);
-                    String fullName = reader.readLine().substring(11);
-                    String email = reader.readLine().substring(7);
-                    String phone = reader.readLine().substring(7);
-                    String role = reader.readLine().substring(6);
-                    String languages = reader.readLine().substring(11);
-                    String experience = reader.readLine().substring(12);
+                    String username = line.substring(10).trim();
+                    String passwordLine = reader.readLine();
+                    String fullNameLine = reader.readLine();
+                    String emailLine = reader.readLine();
+                    String phoneLine = reader.readLine();
+                    String roleLine = reader.readLine();
+                    String languagesLine = reader.readLine();
+                    String experienceLine = reader.readLine();
                     
-                    User guide = new User(username, password, fullName, email, phone, role);
-                    guide.setLanguages(languages);
-                    guide.setExperience(experience);
-                    guides.add(guide);
+                    if (passwordLine != null && fullNameLine != null && emailLine != null && 
+                        phoneLine != null && roleLine != null && languagesLine != null && experienceLine != null) {
+                        
+                        String password = passwordLine.startsWith("Password: ") ? passwordLine.substring(10).trim() : "";
+                        String fullName = fullNameLine.startsWith("Full Name: ") ? fullNameLine.substring(11).trim() : "";
+                        String email = emailLine.startsWith("Email: ") ? emailLine.substring(7).trim() : "";
+                        String phone = phoneLine.startsWith("Phone: ") ? phoneLine.substring(7).trim() : "";
+                        String role = roleLine.startsWith("Role: ") ? roleLine.substring(6).trim() : "";
+                        String languages = languagesLine.startsWith("Languages: ") ? languagesLine.substring(11).trim() : "";
+                        String experience = experienceLine.startsWith("Experience: ") ? experienceLine.substring(12).trim() : "";
+                        
+                        User guide = new User(username, password, fullName, email, phone, role);
+                        guide.setLanguages(languages);
+                        guide.setExperience(experience);
+                        guides.add(guide);
+                    }
                 }
             }
         } catch (IOException e) {
-            // File might not exist yet
+            e.printStackTrace();
         }
         
         return guides;
