@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: linear-gradient(to bottom, #fff3e0, #ffe0b2);" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tourism.controllers.GuideDashboardController">
+<BorderPane prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tourism.controllers.GuideDashboardController">
    <top>
       <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #f57c00; -fx-padding: 15;">
          <children>
@@ -27,11 +27,11 @@
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
          </padding>
          <children>
-            <!-- Left Panel - Profile and Treks -->
+            <!-- Left Panel -->
             <VBox spacing="20.0" HBox.hgrow="ALWAYS">
                <children>
                   <!-- Profile Section -->
-                  <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                  <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10;">
                      <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                      </padding>
@@ -44,7 +44,7 @@
                   </VBox>
                   
                   <!-- Upcoming Treks -->
-                  <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                  <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10;">
                      <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                      </padding>
@@ -64,16 +64,15 @@
                </children>
             </VBox>
             
-            <!-- Right Panel - Important Updates -->
+            <!-- Right Panel -->
             <VBox spacing="20.0" prefWidth="400.0">
                <children>
-                  <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                  <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10;">
                      <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                      </padding>
                      <children>
                         <Label text="Important Updates" style="-fx-font-size: 18; -fx-font-weight: bold;" />
-                        
                         <TextArea fx:id="updatesArea" editable="false" prefHeight="400.0" wrapText="true" />
                      </children>
                   </VBox>
