@@ -1,33 +1,36 @@
 package com.tourism;
 
-import com.tourism.utils.FileManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import com.tourism.utils.FileManager;
 
 public class Main extends Application {
     
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        // Initialize sample data
-        FileManager.initializeSampleData();
-        
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
-        primaryStage.setTitle("Nepal Tourism Management System");
-        primaryStage.setScene(new Scene(root, 800, 600));
-        primaryStage.setResizable(false);
-        primaryStage.show();
-        
-        // Print login credentials for testing
-        System.out.println("=== LOGIN CREDENTIALS ===");
-        System.out.println("Admin: saniya / saniya123");
-        System.out.println("Sample Tourist: tourist1 / password123");
-        System.out.println("Sample Guide: guide1 / password123");
-        System.out.println("========================");
+    public void start(Stage primaryStage) {
+        try {
+            // Initialize data files
+            FileManager.initializeDataFiles();
+            
+            // Load the login FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+            Parent root = loader.load();
+            
+            Scene scene = new Scene(root);
+            primaryStage.setTitle("Nepal Tourism Management System");
+            primaryStage.setScene(scene);
+            primaryStage.setResizable(false);
+            primaryStage.show();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error starting application: " + e.getMessage());
+        }
     }
-
+    
     public static void main(String[] args) {
         launch(args);
     }
