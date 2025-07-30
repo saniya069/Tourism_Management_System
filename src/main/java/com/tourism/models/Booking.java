@@ -37,3 +37,23 @@ public class Booking {
     public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
     
     public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    
+    @Override
+    public String toString() {
+        return bookingId + "," + touristName + "," + attractionName + "," + 
+               date + "," + difficulty + "," + price + "," + status;
+    }
+    
+    public static Booking fromString(String line) {
+        String[] parts = line.split(",", 7);
+        if (parts.length == 7) {
+            return new Booking(parts[0], parts[1], parts[2], parts[3], 
+                             parts[4], Double.parseDouble(parts[5]), parts[6]);
+        }
+        return null;
+    }
+}
