@@ -2,7 +2,6 @@ package com.tourism.controllers;
 
 import com.tourism.models.User;
 import com.tourism.utils.FileManager;
-import com.tourism.utils.PasswordUtils;
 import com.tourism.utils.LanguageManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,25 +28,22 @@ public class LoginController {
     @FXML
     private void initialize() {
         updateLanguage();
-        // Clear error label initially
         errorLabel.setVisible(false);
     }
     
     @FXML
     private void handleLogin() {
         String username = usernameField.getText().trim();
-        String password = passwordField.getText().trim(); // Add trim() to remove spaces
+        String password = passwordField.getText().trim();
         
         if (username.isEmpty() || password.isEmpty()) {
-            showError(languageManager.getText("error.empty.fields"));
+            showError("Please fill in all fields!");
             return;
         }
         
-        // Debug: Print login attempt with character codes
         System.out.println("Login attempt - Username: '" + username + "', Password: '" + password + "'");
-        System.out.println("Password length: " + password.length());
         
-        // Check admin credentials (plain text comparison for admin)
+        // Check admin credentials
         if (username.equals("saniya") && password.equals("saniya123")) {
             System.out.println("Admin login successful");
             openDashboard("admin", username);
@@ -71,7 +67,7 @@ public class LoginController {
         }
         
         System.out.println("Login failed for username: " + username);
-        showError(languageManager.getText("error.invalid.credentials"));
+        showError("Invalid username or password!");
     }
     
     @FXML
@@ -103,10 +99,9 @@ public class LoginController {
     
     private void openDashboard(String role, String username) {
         try {
-            String fxmlFile = "/fxml/" + role + "-dashboard.fxml"; // Use hyphen instead of underscore
+            String fxmlFile = "/fxml/" + role + "-dashboard.fxml";
             System.out.println("Attempting to load FXML file: " + fxmlFile);
             
-            // Check if resource exists
             if (getClass().getResource(fxmlFile) == null) {
                 System.out.println("FXML file not found: " + fxmlFile);
                 showError("Dashboard file not found: " + fxmlFile);
