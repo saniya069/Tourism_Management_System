@@ -100,7 +100,8 @@ public class LoginController {
                     fxmlFile = "/fxml/admin-dashboard.fxml";
                     break;
                 case "tourist":
-                    fxmlFile = "/fxml/tourist-dashboard.fxml"; // Updated FXML file path
+                    // Try simple version first
+                    fxmlFile = "/fxml/tourist-dashboard-simple.fxml";
                     break;
                 case "guide":
                     fxmlFile = "/fxml/guide-dashboard.fxml";
@@ -110,6 +111,7 @@ public class LoginController {
                     return;
             }
             
+            System.out.println("Loading FXML: " + fxmlFile);
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root = loader.load();
             
@@ -129,6 +131,12 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
             showError("Error opening dashboard: " + e.getMessage());
+            
+            // If simple version fails, show detailed error
+            System.err.println("Detailed error information:");
+            System.err.println("User role: " + user.getRole());
+            System.err.println("FXML file attempted: " + (user.getRole().equals("tourist") ? "/fxml/tourist-dashboard-simple.fxml" : "other"));
+            System.err.println("Error: " + e.getClass().getSimpleName() + " - " + e.getMessage());
         }
     }
     
