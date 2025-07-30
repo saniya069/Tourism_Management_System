@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tourism.controllers.TouristDashboardController">
+   <children>
+      <Label fx:id="welcomeLabel" text="Welcome, Tourist!" />
+      <Button fx:id="logoutButton" onAction="#handleLogout" text="Logout" />
+      <TableView fx:id="bookingsTable">
+         <columns>
+            <TableColumn fx:id="bookingIdColumn" text="ID" />
+            <TableColumn fx:id="attractionColumn" text="Attraction" />
+         </columns>
+      </TableView>
+   </children>
+</VBox>
