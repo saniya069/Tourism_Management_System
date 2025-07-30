@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tourism.controllers.AdminDashboardController">
+<BorderPane prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tourism.controllers.AdminDashboardController">
    <top>
       <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #37474f; -fx-padding: 15;">
          <children>
@@ -23,7 +23,7 @@
    </top>
    
    <center>
-      <TabPane fx:id="mainTabPane" style="-fx-background-color: #37474f;" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
          <tabs>
             <!-- Guide Management Tab -->
             <Tab text="Guide Management">
@@ -41,28 +41,22 @@
                            <children>
                               <Label text="Guide Management" style="-fx-font-size: 18; -fx-font-weight: bold;" />
                               
-                              <GridPane hgap="15.0" vgap="15.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                 </rowConstraints>
+                              <HBox spacing="10.0">
                                  <children>
                                     <TextField fx:id="guideUsernameField" promptText="Username" />
-                                    <TextField fx:id="guideNameField" promptText="Full Name" GridPane.columnIndex="1" />
-                                    <PasswordField fx:id="guidePasswordField" promptText="Password" GridPane.columnIndex="2" />
-                                    <TextField fx:id="guideEmailField" promptText="Email" GridPane.columnIndex="3" />
-                                    
-                                    <TextField fx:id="guidePhoneField" promptText="Phone" GridPane.rowIndex="1" />
-                                    <TextField fx:id="guideLanguagesField" promptText="Languages" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <TextField fx:id="guideExperienceField" promptText="Experience" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <TextField fx:id="guideNameField" promptText="Full Name" />
+                                    <PasswordField fx:id="guidePasswordField" promptText="Password" />
+                                    <TextField fx:id="guideEmailField" promptText="Email" />
                                  </children>
-                              </GridPane>
+                              </HBox>
+                              
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <TextField fx:id="guidePhoneField" promptText="Phone" />
+                                    <TextField fx:id="guideLanguagesField" promptText="Languages" />
+                                    <TextField fx:id="guideExperienceField" promptText="Experience" />
+                                 </children>
+                              </HBox>
                               
                               <HBox alignment="CENTER" spacing="10.0">
                                  <children>
