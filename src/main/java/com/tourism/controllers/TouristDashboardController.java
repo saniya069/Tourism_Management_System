@@ -7,8 +7,12 @@ import com.tourism.utils.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
@@ -40,7 +44,7 @@ public class TouristDashboardController {
     
     public void setUsername(String username) {
         this.username = username;
-        welcomeLabel.setText(languageManager.getText("welcome") + ", " + username + "!");
+        welcomeLabel.setText("Welcome, " + username + "!");
         loadBookings();
     }
     
@@ -97,16 +101,15 @@ public class TouristDashboardController {
                                     date.toString(), difficulty, price, "Confirmed");
         
         if (FileManager.saveBooking(booking)) {
-            showSuccess(languageManager.getText("booking.success"));
+            showSuccess("Booking created successfully!");
             loadBookings();
             clearFields();
             
-            // Check for festival discount
             if (isFestivalSeason(date)) {
                 showFestivalDiscountAlert();
             }
         } else {
-            showError(languageManager.getText("booking.failed"));
+            showError("Failed to create booking!");
         }
     }
     
@@ -114,16 +117,14 @@ public class TouristDashboardController {
     private void handleUpdateBooking() {
         Booking selected = bookingsTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showError(languageManager.getText("select.booking.update"));
+            showError("Please select a booking to update!");
             return;
         }
         
-        // Populate fields with selected booking data
         attractionComboBox.setValue(FileManager.getAttractionByName(selected.getAttractionName()));
         datePicker.setValue(LocalDate.parse(selected.getDate()));
         difficultyComboBox.setValue(selected.getDifficulty());
         
-        // Update booking
         if (validateBookingFields()) {
             selected.setAttractionName(attractionComboBox.getValue().getName());
             selected.setDate(datePicker.getValue().toString());
@@ -131,11 +132,11 @@ public class TouristDashboardController {
             selected.setPrice(calculateFinalPrice());
             
             if (FileManager.updateBooking(selected)) {
-                showSuccess(languageManager.getText("booking.updated"));
+                showSuccess("Booking updated successfully!");
                 loadBookings();
                 clearFields();
             } else {
-                showError(languageManager.getText("booking.update.failed"));
+                showError("Failed to update booking!");
             }
         }
     }
@@ -144,22 +145,22 @@ public class TouristDashboardController {
     private void handleDeleteBooking() {
         Booking selected = bookingsTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showError(languageManager.getText("select.booking.delete"));
+            showError("Please select a booking to delete!");
             return;
         }
         
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(languageManager.getText("confirm.delete"));
-        alert.setHeaderText(languageManager.getText("delete.booking.confirm"));
-        alert.setContentText(languageManager.getText("action.cannot.undone"));
+        alert.setTitle("Confirm Delete");
+        alert.setHeaderText("Are you sure you want to delete this booking?");
+        alert.setContentText("This action cannot be undone.");
         
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             if (FileManager.deleteBooking(selected.getBookingId())) {
-                showSuccess(languageManager.getText("booking.deleted"));
+                showSuccess("Booking deleted successfully!");
                 loadBookings();
             } else {
-                showError(languageManager.getText("booking.delete.failed"));
+                showError("Failed to delete booking!");
             }
         }
     }
@@ -167,10 +168,9 @@ public class TouristDashboardController {
     @FXML
     private void handleLogout() {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/fxml/login.fxml"));
-            javafx.scene.Parent root = loader.load();
-            javafx.stage.Stage stage = (javafx.stage.Stage) logoutButton.getScene().getWindow();
-            stage.setScene(new javafx.scene.Scene(root, 800, 600));
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.setScene(new Scene(root, 800, 600));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -180,7 +180,7 @@ public class TouristDashboardController {
     private void toggleLanguage() {
         languageManager.toggleLanguage();
         updateLanguage();
-        welcomeLabel.setText(languageManager.getText("welcome") + ", " + username + "!");
+        welcomeLabel.setText("Welcome, " + username + "!");
     }
     
     private void calculatePrice() {
@@ -198,7 +198,6 @@ public class TouristDashboardController {
         double basePrice = attractionComboBox.getValue().getBasePrice();
         String difficulty = difficultyComboBox.getValue();
         
-        // Difficulty multiplier
         double multiplier = 1.0;
         switch (difficulty) {
             case "Medium": multiplier = 1.2; break;
@@ -207,7 +206,6 @@ public class TouristDashboardController {
         
         double finalPrice = basePrice * multiplier;
         
-        // Festival discount (20% off between August-October)
         if (datePicker.getValue() != null && isFestivalSeason(datePicker.getValue())) {
             finalPrice *= 0.8; // 20% discount
         }
@@ -222,17 +220,17 @@ public class TouristDashboardController {
     
     private void showFestivalDiscountAlert() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(languageManager.getText("festival.discount.title"));
-        alert.setHeaderText(languageManager.getText("festival.discount.header"));
-        alert.setContentText(languageManager.getText("festival.discount.message"));
+        alert.setTitle("Festival Discount Applied!");
+        alert.setHeaderText("Dashain & Tihar Special");
+        alert.setContentText("You have received a 20% festival discount on your booking!");
         alert.showAndWait();
     }
     
     private void showHighAltitudeWarning() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(languageManager.getText("altitude.warning.title"));
-        alert.setHeaderText(languageManager.getText("altitude.warning.header"));
-        alert.setContentText(languageManager.getText("altitude.warning.message"));
+        alert.setTitle("High Altitude Warning");
+        alert.setHeaderText("Safety Alert");
+        alert.setContentText("This trek involves high altitude. Please ensure you are physically prepared and consult a doctor if necessary.");
         alert.showAndWait();
     }
     
@@ -240,12 +238,12 @@ public class TouristDashboardController {
         if (attractionComboBox.getValue() == null ||
             datePicker.getValue() == null ||
             difficultyComboBox.getValue() == null) {
-            showError(languageManager.getText("error.empty.booking.fields"));
+            showError("Please select attraction, date, and difficulty!");
             return false;
         }
         
         if (datePicker.getValue().isBefore(LocalDate.now())) {
-            showError(languageManager.getText("error.past.date"));
+            showError("Cannot book for past dates!");
             return false;
         }
         
@@ -266,16 +264,16 @@ public class TouristDashboardController {
     }
     
     private void updateLanguage() {
-        bookButton.setText(languageManager.getText("book.button"));
-        updateButton.setText(languageManager.getText("update.button"));
-        deleteButton.setText(languageManager.getText("delete.button"));
-        logoutButton.setText(languageManager.getText("logout.button"));
+        bookButton.setText("Book Now");
+        updateButton.setText("Update");
+        deleteButton.setText("Delete");
+        logoutButton.setText("Logout");
         languageToggle.setText(languageManager.getCurrentLanguage().equals("EN") ? "नेपाली" : "English");
     }
     
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(languageManager.getText("error.title"));
+        alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
@@ -283,7 +281,7 @@ public class TouristDashboardController {
     
     private void showSuccess(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(languageManager.getText("success.title"));
+        alert.setTitle("Success");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
