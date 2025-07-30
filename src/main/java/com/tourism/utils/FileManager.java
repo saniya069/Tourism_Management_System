@@ -11,22 +11,22 @@ public class FileManager {
     
     public static boolean saveUser(User user, String fileName) {
         try (FileWriter writer = new FileWriter(fileName, true)) {
-            writer.write("Username: " + user.getUsername() + "\n");
-            writer.write("Password: " + user.getPassword() + "\n");  // Save as plain text for now
-            writer.write("Full Name: " + user.getFullName() + "\n");
-            writer.write("Email: " + user.getEmail() + "\n");
-            writer.write("Phone: " + user.getPhone() + "\n");
-            writer.write("Role: " + user.getRole() + "\n");
+            writer.write("Username: " + user.getUsername().trim() + "\n");
+            writer.write("Password: " + user.getPassword().trim() + "\n");  // Trim password
+            writer.write("Full Name: " + user.getFullName().trim() + "\n");
+            writer.write("Email: " + user.getEmail().trim() + "\n");
+            writer.write("Phone: " + user.getPhone().trim() + "\n");
+            writer.write("Role: " + user.getRole().trim() + "\n");
             
             if ("Guide".equals(user.getRole())) {
-                writer.write("Languages: " + user.getLanguages() + "\n");
-                writer.write("Experience: " + user.getExperience() + "\n");
+                writer.write("Languages: " + user.getLanguages().trim() + "\n");
+                writer.write("Experience: " + user.getExperience().trim() + "\n");
             }
             
             writer.write("------------------------\n");
             
             // Debug output
-            System.out.println("Saved user to " + fileName + ": " + user.getUsername());
+            System.out.println("Saved user to " + fileName + ": " + user.getUsername().trim());
             return true;
         } catch (IOException e) {
             System.out.println("Error saving user: " + e.getMessage());
@@ -48,7 +48,7 @@ public class FileManager {
             }
         }
         
-        System.out.println("Authenticating user: " + username + " in file: " + fileName);
+        System.out.println("Authenticating user: '" + username + "' in file: " + fileName);
         
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -64,10 +64,11 @@ public class FileManager {
                     
                     String filePassword = passwordLine.substring(10).trim();
                     
-                    System.out.println("Found user: " + fileUsername + " with password: " + filePassword);
+                    System.out.println("Found user: '" + fileUsername + "' with password: '" + filePassword + "'");
+                    System.out.println("Comparing with input: '" + username + "' / '" + password + "'");
                     
                     if (fileUsername.equals(username)) {
-                        // For now, use simple plain text comparison
+                        // Simple string comparison with trimmed values
                         if (password.equals(filePassword)) {
                             System.out.println("Password matched for user: " + username);
                             
@@ -105,7 +106,21 @@ public class FileManager {
                             return user;
                         } else {
                             System.out.println("Password mismatch for user: " + username);
-                            System.out.println("Expected: " + filePassword + ", Got: " + password);
+                            System.out.println("Expected: '" + filePassword + "' (length: " + filePassword.length() + ")");
+                            System.out.println("Got: '" + password + "' (length: " + password.length() + ")");
+                            
+                            // Debug: Print character codes
+                            System.out.print("Expected chars: ");
+                            for (char c : filePassword.toCharArray()) {
+                                System.out.print((int)c + " ");
+                            }
+                            System.out.println();
+                            
+                            System.out.print("Got chars: ");
+                            for (char c : password.toCharArray()) {
+                                System.out.print((int)c + " ");
+                            }
+                            System.out.println();
                         }
                     }
                 }
