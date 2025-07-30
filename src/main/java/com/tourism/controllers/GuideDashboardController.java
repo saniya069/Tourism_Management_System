@@ -1,9 +1,5 @@
 package com.tourism.controllers;
 
-import com.tourism.models.Booking;
-import com.tourism.models.User;
-import com.tourism.utils.FileManager;
-import com.tourism.utils.LanguageManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,11 +9,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import com.tourism.models.User;
+import com.tourism.models.Booking;
+import com.tourism.utils.FileManager;
 import java.util.List;
 
 public class GuideDashboardController {
     
     @FXML private Label welcomeLabel;
+    @FXML private Button languageToggle;
+    @FXML private Button logoutButton;
     @FXML private Label earningsLabel;
     @FXML private Label languagesLabel;
     @FXML private Label experienceLabel;
@@ -27,98 +28,125 @@ public class GuideDashboardController {
     @FXML private TableColumn<Booking, String> dateColumn;
     @FXML private TableColumn<Booking, String> difficultyColumn;
     @FXML private TextArea updatesArea;
-    @FXML private Button languageToggle;
-    @FXML private Button logoutButton;
     
-    private String username;
-    private LanguageManager languageManager = LanguageManager.getInstance();
+    private User currentUser;
+    private boolean isNepali = false;
     private ObservableList<Booking> treksList = FXCollections.observableArrayList();
     
-    public void setUsername(String username) {
-        this.username = username;
-        loadGuideData();
-        loadUpcomingTreks();
-        loadImportantUpdates();
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+        initialize();
     }
     
     @FXML
     private void initialize() {
-        setupTable();
-        updateLanguage();
-    }
-    
-    private void setupTable() {
-        touristColumn.setCellValueFactory(new PropertyValueFactory<>("touristName"));
-        trekColumn.setCellValueFactory(new PropertyValueFactory<>("attractionName"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-        difficultyColumn.setCellValueFactory(new PropertyValueFactory<>("difficulty"));
-        
-        treksTable.setItems(treksList);
-    }
-    
-    private void loadGuideData() {
-        User guide = FileManager.getUserByUsername(username, "guides.txt");
-        if (guide != null) {
-            welcomeLabel.setText("Welcome, " + guide.getFullName() + "!");
-            languagesLabel.setText("Languages: " + guide.getLanguages());
-            experienceLabel.setText("Experience: " + guide.getExperience());
+        if (currentUser != null) {
+            welcomeLabel.setText("Welcome, " + currentUser.getFullName() + "!");
             
-            double totalEarnings = calculateEarnings();
-            earningsLabel.setText("Earnings: $" + String.format("%.2f", totalEarnings));
+            // Initialize table columns
+            touristColumn.setCellValueFactory(new PropertyValueFactory<>("touristName"));
+            trekColumn.setCellValueFactory(new PropertyValueFactory<>("attractionName"));
+            dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+            difficultyColumn.setCellValueFactory(new PropertyValueFactory<>("difficulty"));
+            
+            // Load profile information
+            loadProfileInfo();
+            loadAssignedTreks();
+            loadUpdates();
         }
     }
     
-    private void loadUpcomingTreks() {
-        List<Booking> assignedTreks = FileManager.loadGuideBookings(username);
-        treksList.clear();
-        treksList.addAll(assignedTreks);
+    private void loadProfileInfo() {
+        // Calculate earnings from completed treks
+        double totalEarnings = calculateEarnings();
+        earningsLabel.setText("Earnings: $" + String.format("%.2f", totalEarnings));
+        
+        // Display languages and experience
+        languagesLabel.setText("Languages: " + (currentUser.getLanguages() != null ? currentUser.getLanguages() : "Not specified"));
+        experienceLabel.setText("Experience: " + (currentUser.getExperience() != null ? currentUser.getExperience() : "Not specified"));
     }
     
-    private void loadImportantUpdates() {
+    private double calculateEarnings() {
+        double earnings = 0.0;
+        try {
+            List<Booking> bookings = FileManager.loadBookings();
+            for (Booking booking : bookings) {
+                if ("Completed".equals(booking.getStatus())) {
+                    // Guides get 20% commission
+                    earnings += booking.getPrice() * 0.20;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error calculating earnings: " + e.getMessage());
+        }
+        return earnings;
+    }
+    
+    private void loadAssignedTreks() {
+        try {
+            List<Booking> bookings = FileManager.loadBookings();
+            treksList.clear();
+            for (Booking booking : bookings) {
+                if ("Confirmed".equals(booking.getStatus()) || "In Progress".equals(booking.getStatus())) {
+                    treksList.add(booking);
+                }
+            }
+            treksTable.setItems(treksList);
+        } catch (Exception e) {
+            showAlert("Error loading assigned treks: " + e.getMessage());
+        }
+    }
+    
+    private void loadUpdates() {
         StringBuilder updates = new StringBuilder();
-        updates.append("Weather Alerts:\n");
-        updates.append("• Heavy snow expected on Everest trek routes\n");
-        updates.append("• Clear weather conditions in Annapurna region\n\n");
-        
-        updates.append("Emergency Notices:\n");
-        updates.append("• Rescue helicopter services available 24/7\n");
-        updates.append("• Medical checkup required for high altitude treks\n");
+        updates.append("Important Updates for Guides:\n\n");
+        updates.append("• Weather Alert: Check weather conditions before each trek\n");
+        updates.append("• Safety Protocol: Always carry first aid kit and emergency contacts\n");
+        updates.append("• New Route: Annapurna Circuit has new rest stops available\n");
+        updates.append("• Festival Season: Expect higher tourist volume during Dashain\n");
+        updates.append("• Training: Mandatory safety training scheduled for next month\n");
+        updates.append("• Equipment: New GPS devices available at the office\n");
+        updates.append("• Emergency: Contact +977-1-4444444 for any emergencies\n");
         
         updatesArea.setText(updates.toString());
     }
     
-    private double calculateEarnings() {
-        List<Booking> guideBookings = FileManager.loadGuideBookings(username);
-        double totalEarnings = 0.0;
-        
-        for (Booking booking : guideBookings) {
-            totalEarnings += booking.getPrice() * 0.12; // 12% commission
-        }
-        
-        return totalEarnings;
+    @FXML
+    private void toggleLanguage() {
+        isNepali = !isNepali;
+        updateLanguage();
     }
     
     @FXML
     private void handleLogout() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+            Parent root = loader.load();
+            
             Stage stage = (Stage) logoutButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 800, 600));
+            stage.setScene(new Scene(root));
         } catch (Exception e) {
-            e.printStackTrace();
+            showAlert("Error logging out: " + e.getMessage());
         }
     }
     
-    @FXML
-    private void toggleLanguage() {
-        languageManager.toggleLanguage();
-        updateLanguage();
-        loadGuideData();
-        loadImportantUpdates();
+    private void updateLanguage() {
+        if (isNepali) {
+            welcomeLabel.setText("स्वागतम्, " + currentUser.getFullName() + "!");
+            languageToggle.setText("English");
+            logoutButton.setText("लगआउट");
+        } else {
+            welcomeLabel.setText("Welcome, " + currentUser.getFullName() + "!");
+            languageToggle.setText("नेपाली");
+            logoutButton.setText("Logout");
+        }
     }
     
-    private void updateLanguage() {
-        logoutButton.setText("Logout");
-        languageToggle.setText(languageManager.getCurrentLanguage().equals("EN") ? "नेपाली" : "English");
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
