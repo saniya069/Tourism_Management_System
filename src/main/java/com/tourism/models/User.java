@@ -10,13 +10,16 @@ public class User {
     private String languages;
     private String experience;
     
-    public User(String username, String password, String fullName, String email, String phone, String role) {
+    public User(String username, String password, String fullName, String email, 
+                String phone, String role, String languages, String experience) {
         this.username = username;
         this.password = password;
         this.fullName = fullName;
         this.email = email;
         this.phone = phone;
         this.role = role;
+        this.languages = languages;
+        this.experience = experience;
     }
     
     // Getters and Setters
@@ -46,6 +49,20 @@ public class User {
     
     @Override
     public String toString() {
-        return fullName + " (" + username + ")";
+        return username + "," + password + "," + fullName + "," + email + "," + 
+               phone + "," + role + "," + (languages != null ? languages : "") + "," + 
+               (experience != null ? experience : "");
+    }
+    
+    public static User fromString(String line) {
+        String[] parts = line.split(",", 8);
+        if (parts.length >= 6) {
+            return new User(
+                parts[0], parts[1], parts[2], parts[3], parts[4], parts[5],
+                parts.length > 6 ? parts[6] : "",
+                parts.length > 7 ? parts[7] : ""
+            );
+        }
+        return null;
     }
 }
