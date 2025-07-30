@@ -8,6 +8,21 @@ public class LanguageManager {
     private String currentLanguage = "EN";
     private Map<String, String> englishTexts;
     private Map<String, String> nepaliTexts;
+    private static Map<String, String> englishToNepali = new HashMap<>();
+    
+    static {
+        // Initialize translations
+        englishToNepali.put("Welcome", "स्वागतम्");
+        englishToNepali.put("Login", "लगइन");
+        englishToNepali.put("Register", "दर्ता");
+        englishToNepali.put("Username", "प्रयोगकर्ता नाम");
+        englishToNepali.put("Password", "पासवर्ड");
+        englishToNepali.put("Logout", "लगआउट");
+        englishToNepali.put("Book Now", "बुक गर्नुहोस्");
+        englishToNepali.put("Update", "अपडेट");
+        englishToNepali.put("Delete", "मेटाउनुहोस्");
+        englishToNepali.put("Back", "फिर्ता");
+    }
     
     private LanguageManager() {
         initializeTexts();
@@ -277,5 +292,27 @@ public class LanguageManager {
     
     public String getCurrentLanguage() {
         return currentLanguage;
+    }
+    
+    public static String translate(String text, boolean toNepali) {
+        if (toNepali && englishToNepali.containsKey(text)) {
+            return englishToNepali.get(text);
+        }
+        return text;
+    }
+    
+    public static boolean isFestivalSeason() {
+        // Simple check for festival season (October-November)
+        java.time.LocalDate now = java.time.LocalDate.now();
+        int month = now.getMonthValue();
+        return month == 10 || month == 11;
+    }
+    
+    public static String getFestivalMessage(boolean isNepali) {
+        if (isNepali) {
+            return "चाडपर्वको मौसममा विशेष छुट!";
+        } else {
+            return "Special festival season discount!";
+        }
     }
 }
