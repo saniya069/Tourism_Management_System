@@ -56,10 +56,10 @@ public class TouristDashboardController implements Initializable {
             // Check if all FXML elements are properly injected
             checkFXMLInjection();
             
-            // Initialize table columns with null checks
+            // Initialize table columns programmatically
             initializeTableColumns();
             
-            // Set up event handlers with null checks
+            // Set up event handlers
             setupEventHandlers();
             
             System.out.println("Controller initialized successfully");
@@ -70,128 +70,202 @@ public class TouristDashboardController implements Initializable {
     }
     
     private void checkFXMLInjection() {
-        System.out.println("Checking FXML injection...");
-        System.out.println("welcomeLabel: " + (welcomeLabel != null ? "OK" : "NULL"));
-        System.out.println("attractionComboBox: " + (attractionComboBox != null ? "OK" : "NULL"));
-        System.out.println("datePicker: " + (datePicker != null ? "OK" : "NULL"));
-        System.out.println("difficultyComboBox: " + (difficultyComboBox != null ? "OK" : "NULL"));
-        System.out.println("priceLabel: " + (priceLabel != null ? "OK" : "NULL"));
-        System.out.println("bookingsTable: " + (bookingsTable != null ? "OK" : "NULL"));
-        System.out.println("bookingIdColumn: " + (bookingIdColumn != null ? "OK" : "NULL"));
-        System.out.println("attractionColumn: " + (attractionColumn != null ? "OK" : "NULL"));
-        System.out.println("dateColumn: " + (dateColumn != null ? "OK" : "NULL"));
-        System.out.println("difficultyColumn: " + (difficultyColumn != null ? "OK" : "NULL"));
-        System.out.println("priceColumn: " + (priceColumn != null ? "OK" : "NULL"));
-        System.out.println("statusColumn: " + (statusColumn != null ? "OK" : "NULL"));
+        System.out.println("=== FXML Injection Check ===");
+        System.out.println("welcomeLabel: " + (welcomeLabel != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("languageToggle: " + (languageToggle != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("logoutButton: " + (logoutButton != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("attractionComboBox: " + (attractionComboBox != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("datePicker: " + (datePicker != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("difficultyComboBox: " + (difficultyComboBox != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("priceLabel: " + (priceLabel != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("bookButton: " + (bookButton != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("updateButton: " + (updateButton != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("deleteButton: " + (deleteButton != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("bookingsTable: " + (bookingsTable != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("bookingIdColumn: " + (bookingIdColumn != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("attractionColumn: " + (attractionColumn != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("dateColumn: " + (dateColumn != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("difficultyColumn: " + (difficultyColumn != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("priceColumn: " + (priceColumn != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("statusColumn: " + (statusColumn != null ? "✓ OK" : "✗ NULL"));
+        System.out.println("=== End Injection Check ===");
     }
     
     private void initializeTableColumns() {
-        if (bookingIdColumn != null) {
-            bookingIdColumn.setCellValueFactory(new PropertyValueFactory<>("bookingId"));
-        }
-        if (attractionColumn != null) {
-            attractionColumn.setCellValueFactory(new PropertyValueFactory<>("attractionName"));
-        }
-        if (dateColumn != null) {
-            dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-        }
-        if (difficultyColumn != null) {
-            difficultyColumn.setCellValueFactory(new PropertyValueFactory<>("difficulty"));
-        }
-        if (priceColumn != null) {
-            priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-        }
-        if (statusColumn != null) {
-            statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-        }
+        System.out.println("Setting up table columns...");
         
-        System.out.println("Table columns initialized");
+        try {
+            if (bookingIdColumn != null) {
+                bookingIdColumn.setCellValueFactory(new PropertyValueFactory<>("bookingId"));
+                System.out.println("✓ bookingIdColumn configured");
+            } else {
+                System.err.println("✗ bookingIdColumn is null");
+            }
+            
+            if (attractionColumn != null) {
+                attractionColumn.setCellValueFactory(new PropertyValueFactory<>("attractionName"));
+                System.out.println("✓ attractionColumn configured");
+            } else {
+                System.err.println("✗ attractionColumn is null");
+            }
+            
+            if (dateColumn != null) {
+                dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+                System.out.println("✓ dateColumn configured");
+            } else {
+                System.err.println("✗ dateColumn is null");
+            }
+            
+            if (difficultyColumn != null) {
+                difficultyColumn.setCellValueFactory(new PropertyValueFactory<>("difficulty"));
+                System.out.println("✓ difficultyColumn configured");
+            } else {
+                System.err.println("✗ difficultyColumn is null");
+            }
+            
+            if (priceColumn != null) {
+                priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+                System.out.println("✓ priceColumn configured");
+            } else {
+                System.err.println("✗ priceColumn is null");
+            }
+            
+            if (statusColumn != null) {
+                statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+                System.out.println("✓ statusColumn configured");
+            } else {
+                System.err.println("✗ statusColumn is null");
+            }
+            
+            System.out.println("Table columns setup completed");
+        } catch (Exception e) {
+            System.err.println("Error setting up table columns: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     private void setupEventHandlers() {
-        if (attractionComboBox != null) {
-            attractionComboBox.setOnAction(e -> updatePrice());
-        }
-        if (difficultyComboBox != null) {
-            difficultyComboBox.setOnAction(e -> updatePrice());
-        }
+        System.out.println("Setting up event handlers...");
         
-        System.out.println("Event handlers set up");
+        try {
+            if (attractionComboBox != null) {
+                attractionComboBox.setOnAction(e -> updatePrice());
+                System.out.println("✓ attractionComboBox event handler set");
+            }
+            
+            if (difficultyComboBox != null) {
+                difficultyComboBox.setOnAction(e -> updatePrice());
+                System.out.println("✓ difficultyComboBox event handler set");
+            }
+            
+            System.out.println("Event handlers setup completed");
+        } catch (Exception e) {
+            System.err.println("Error setting up event handlers: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     public void setCurrentUser(User user) {
+        System.out.println("=== Setting Current User ===");
         this.currentUser = user;
-        System.out.println("Setting current user: " + user.getUsername());
+        System.out.println("User: " + user.getUsername() + " (" + user.getFullName() + ")");
         
         // Update welcome label
         if (welcomeLabel != null && currentUser != null) {
             welcomeLabel.setText("Welcome, " + currentUser.getFullName() + "!");
+            System.out.println("✓ Welcome label updated");
+        } else {
+            System.err.println("✗ Cannot update welcome label - welcomeLabel or currentUser is null");
         }
         
         // Load data
         loadAttractions();
         loadDifficulties();
         loadBookings();
+        
+        System.out.println("=== User Setup Complete ===");
     }
     
     private void loadAttractions() {
+        System.out.println("Loading attractions...");
+        
         if (attractionComboBox == null) {
-            System.err.println("attractionComboBox is null, cannot load attractions");
+            System.err.println("✗ attractionComboBox is null, cannot load attractions");
             return;
         }
         
         try {
             List<Attraction> attractions = FileManager.loadAttractions();
             ObservableList<String> attractionNames = FXCollections.observableArrayList();
+            
             for (Attraction attraction : attractions) {
                 attractionNames.add(attraction.getName());
+                System.out.println("  - " + attraction.getName());
             }
+            
             attractionComboBox.setItems(attractionNames);
-            System.out.println("Loaded " + attractions.size() + " attractions");
+            System.out.println("✓ Loaded " + attractions.size() + " attractions");
         } catch (Exception e) {
-            System.err.println("Error loading attractions: " + e.getMessage());
+            System.err.println("✗ Error loading attractions: " + e.getMessage());
+            e.printStackTrace();
             showAlert("Error loading attractions: " + e.getMessage());
         }
     }
     
     private void loadDifficulties() {
+        System.out.println("Loading difficulties...");
+        
         if (difficultyComboBox == null) {
-            System.err.println("difficultyComboBox is null, cannot load difficulties");
+            System.err.println("✗ difficultyComboBox is null, cannot load difficulties");
             return;
         }
         
         try {
-            difficultyComboBox.setItems(FXCollections.observableArrayList("Easy", "Medium", "Hard", "Extreme"));
-            System.out.println("Difficulty levels loaded");
+            ObservableList<String> difficulties = FXCollections.observableArrayList("Easy", "Medium", "Hard", "Extreme");
+            difficultyComboBox.setItems(difficulties);
+            System.out.println("✓ Difficulty levels loaded: " + difficulties);
         } catch (Exception e) {
-            System.err.println("Error loading difficulties: " + e.getMessage());
+            System.err.println("✗ Error loading difficulties: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
     private void loadBookings() {
-        if (bookingsTable == null || currentUser == null) {
-            System.err.println("bookingsTable is null or currentUser is null, cannot load bookings");
+        System.out.println("Loading bookings...");
+        
+        if (bookingsTable == null) {
+            System.err.println("✗ bookingsTable is null, cannot load bookings");
+            return;
+        }
+        
+        if (currentUser == null) {
+            System.err.println("✗ currentUser is null, cannot load bookings");
             return;
         }
         
         try {
-            List<Booking> bookings = FileManager.loadBookings();
+            List<Booking> allBookings = FileManager.loadBookings();
             bookingsList.clear();
-            for (Booking booking : bookings) {
+            
+            for (Booking booking : allBookings) {
                 if (booking.getTouristName().equals(currentUser.getUsername())) {
                     bookingsList.add(booking);
+                    System.out.println("  - Booking: " + booking.getBookingId() + " for " + booking.getAttractionName());
                 }
             }
+            
             bookingsTable.setItems(bookingsList);
-            System.out.println("Loaded " + bookingsList.size() + " bookings for user: " + currentUser.getUsername());
+            System.out.println("✓ Loaded " + bookingsList.size() + " bookings for user: " + currentUser.getUsername());
         } catch (Exception e) {
-            System.err.println("Error loading bookings: " + e.getMessage());
+            System.err.println("✗ Error loading bookings: " + e.getMessage());
+            e.printStackTrace();
             showAlert("Error loading bookings: " + e.getMessage());
         }
     }
     
     private void updatePrice() {
         if (attractionComboBox == null || difficultyComboBox == null || priceLabel == null) {
+            System.err.println("Cannot update price - form elements are null");
             return;
         }
         
@@ -207,11 +281,13 @@ public class TouristDashboardController implements Initializable {
                         double multiplier = getDifficultyMultiplier(difficulty);
                         double finalPrice = basePrice * multiplier;
                         priceLabel.setText("$" + String.format("%.2f", finalPrice));
+                        System.out.println("Price updated: " + attractionName + " (" + difficulty + ") = $" + String.format("%.2f", finalPrice));
                         return;
                     }
                 }
             } catch (Exception e) {
                 System.err.println("Error calculating price: " + e.getMessage());
+                e.printStackTrace();
             }
         }
         priceLabel.setText("$0.00");
@@ -229,8 +305,10 @@ public class TouristDashboardController implements Initializable {
     
     @FXML
     private void handleBooking() {
-        System.out.println("handleBooking() called");
+        System.out.println("=== Handle Booking ===");
+        
         if (!validateBookingForm()) {
+            System.err.println("Booking form validation failed");
             return;
         }
         
@@ -244,22 +322,33 @@ public class TouristDashboardController implements Initializable {
             Booking newBooking = new Booking(bookingId, currentUser.getUsername(), 
                                            attractionName, date, difficulty, price, "Confirmed");
             
+            System.out.println("Creating booking: " + bookingId);
+            System.out.println("  Tourist: " + currentUser.getUsername());
+            System.out.println("  Attraction: " + attractionName);
+            System.out.println("  Date: " + date);
+            System.out.println("  Difficulty: " + difficulty);
+            System.out.println("  Price: $" + price);
+            
             if (FileManager.saveBooking(newBooking)) {
+                System.out.println("✓ Booking saved successfully");
                 showAlert("Booking successful! Booking ID: " + bookingId);
                 loadBookings();
                 clearForm();
             } else {
+                System.err.println("✗ Failed to save booking");
                 showAlert("Booking failed. Please try again.");
             }
         } catch (Exception e) {
-            System.err.println("Error creating booking: " + e.getMessage());
+            System.err.println("✗ Error creating booking: " + e.getMessage());
+            e.printStackTrace();
             showAlert("Error creating booking: " + e.getMessage());
         }
     }
     
     @FXML
     private void handleUpdateBooking() {
-        System.out.println("handleUpdateBooking() called");
+        System.out.println("=== Handle Update Booking ===");
+        
         if (bookingsTable == null) {
             showAlert("Table not available");
             return;
@@ -276,27 +365,33 @@ public class TouristDashboardController implements Initializable {
         }
         
         try {
+            System.out.println("Updating booking: " + selectedBooking.getBookingId());
+            
             selectedBooking.setAttractionName(attractionComboBox.getValue());
             selectedBooking.setDate(datePicker.getValue().toString());
             selectedBooking.setDifficulty(difficultyComboBox.getValue());
             selectedBooking.setPrice(Double.parseDouble(priceLabel.getText().replace("$", "")));
             
             if (FileManager.updateBooking(selectedBooking)) {
+                System.out.println("✓ Booking updated successfully");
                 showAlert("Booking updated successfully!");
                 loadBookings();
                 clearForm();
             } else {
+                System.err.println("✗ Failed to update booking");
                 showAlert("Update failed. Please try again.");
             }
         } catch (Exception e) {
-            System.err.println("Error updating booking: " + e.getMessage());
+            System.err.println("✗ Error updating booking: " + e.getMessage());
+            e.printStackTrace();
             showAlert("Error updating booking: " + e.getMessage());
         }
     }
     
     @FXML
     private void handleDeleteBooking() {
-        System.out.println("handleDeleteBooking() called");
+        System.out.println("=== Handle Delete Booking ===");
+        
         if (bookingsTable == null) {
             showAlert("Table not available");
             return;
@@ -315,15 +410,20 @@ public class TouristDashboardController implements Initializable {
         
         if (confirmAlert.showAndWait().get() == ButtonType.OK) {
             try {
+                System.out.println("Deleting booking: " + selectedBooking.getBookingId());
+                
                 if (FileManager.deleteBooking(selectedBooking.getBookingId())) {
+                    System.out.println("✓ Booking deleted successfully");
                     showAlert("Booking deleted successfully!");
                     loadBookings();
                     clearForm();
                 } else {
+                    System.err.println("✗ Failed to delete booking");
                     showAlert("Delete failed. Please try again.");
                 }
             } catch (Exception e) {
-                System.err.println("Error deleting booking: " + e.getMessage());
+                System.err.println("✗ Error deleting booking: " + e.getMessage());
+                e.printStackTrace();
                 showAlert("Error deleting booking: " + e.getMessage());
             }
         }
@@ -331,22 +431,24 @@ public class TouristDashboardController implements Initializable {
     
     @FXML
     private void toggleLanguage() {
-        System.out.println("toggleLanguage() called");
+        System.out.println("Toggling language from " + (isNepali ? "Nepali" : "English"));
         isNepali = !isNepali;
         updateLanguage();
     }
     
     @FXML
     private void handleLogout() {
-        System.out.println("handleLogout() called");
+        System.out.println("=== Handle Logout ===");
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
             Parent root = loader.load();
             
             Stage stage = (Stage) logoutButton.getScene().getWindow();
             stage.setScene(new Scene(root));
+            System.out.println("✓ Logged out successfully");
         } catch (Exception e) {
-            System.err.println("Error logging out: " + e.getMessage());
+            System.err.println("✗ Error logging out: " + e.getMessage());
+            e.printStackTrace();
             showAlert("Error logging out: " + e.getMessage());
         }
     }
@@ -368,6 +470,7 @@ public class TouristDashboardController implements Initializable {
                 if (updateButton != null) updateButton.setText("Update");
                 if (deleteButton != null) deleteButton.setText("Delete");
             }
+            System.out.println("Language updated to: " + (isNepali ? "Nepali" : "English"));
         }
     }
     
@@ -401,6 +504,7 @@ public class TouristDashboardController implements Initializable {
         if (datePicker != null) datePicker.setValue(null);
         if (difficultyComboBox != null) difficultyComboBox.setValue(null);
         if (priceLabel != null) priceLabel.setText("$0.00");
+        System.out.println("Form cleared");
     }
     
     private void showAlert(String message) {
@@ -410,6 +514,7 @@ public class TouristDashboardController implements Initializable {
             alert.setHeaderText(null);
             alert.setContentText(message);
             alert.showAndWait();
+            System.out.println("Alert shown: " + message);
         } catch (Exception e) {
             System.err.println("Error showing alert: " + e.getMessage());
             System.out.println("Alert message was: " + message);
