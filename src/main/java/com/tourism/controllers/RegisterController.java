@@ -1,43 +1,45 @@
 package com.tourism.controllers;
 
-import com.tourism.models.User;
-import com.tourism.utils.FileManager;
-import com.tourism.utils.LanguageManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import java.io.IOException;
+import com.tourism.models.User;
+import com.tourism.utils.FileManager;
 
 public class RegisterController {
     
+    @FXML private Label titleLabel;
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private TextField fullNameField;
     @FXML private TextField emailField;
     @FXML private TextField phoneField;
     @FXML private ComboBox<String> roleComboBox;
+    @FXML private Label languagesLabel;
     @FXML private TextField languagesField;
+    @FXML private Label experienceLabel;
     @FXML private TextField experienceField;
     @FXML private Button registerButton;
     @FXML private Button backButton;
     @FXML private Button languageToggle;
-    @FXML private Label titleLabel;
     @FXML private Label errorLabel;
-    @FXML private Label languagesLabel;
-    @FXML private Label experienceLabel;
     
-    private LanguageManager languageManager = LanguageManager.getInstance();
+    private boolean isNepali = false;
     
     @FXML
     private void initialize() {
+        // Initialize role combo box
         roleComboBox.getItems().addAll("Tourist", "Guide");
-        roleComboBox.setOnAction(e -> toggleGuideFields());
+        roleComboBox.setValue("Tourist");
+        
+        // Show/hide guide-specific fields based on role selection
+        roleComboBox.setOnAction(e -> updateFieldVisibility());
+        
         updateLanguage();
-        hideGuideFields();
-        errorLabel.setVisible(false);
+        updateFieldVisibility();
     }
     
     @FXML
@@ -46,130 +48,110 @@ public class RegisterController {
             return;
         }
         
-        String username = usernameField.getText().trim();
-        String password = passwordField.getText();
-        String fullName = fullNameField.getText().trim();
-        String email = emailField.getText().trim();
-        String phone = phoneField.getText().trim();
-        String role = roleComboBox.getValue();
-        
-        if (FileManager.userExists(username)) {
-            showError("Username already exists!");
-            return;
-        }
-        
-        User user = new User(username, password, fullName, email, phone, role);
-        
-        if (role.equals("Guide")) {
-            user.setLanguages(languagesField.getText().trim());
-            user.setExperience(experienceField.getText().trim());
-        }
-        
-        String fileName = role.equals("Tourist") ? "tourists.txt" : "guides.txt";
-        
-        System.out.println("Registering user: " + username + " with password: " + password + " in file: " + fileName);
-        
-        if (FileManager.saveUser(user, fileName)) {
-            showSuccess("Registration successful!");
+        try {
+            String username = usernameField.getText().trim();
+            String password = passwordField.getText().trim();
+            String fullName = fullNameField.getText().trim();
+            String email = emailField.getText().trim();
+            String phone = phoneField.getText().trim();
+            String role = roleComboBox.getValue().toLowerCase();
+            String languages = languagesField.getText().trim();
+            String experience = experienceField.getText().trim();
             
-            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
-            infoAlert.setTitle("Registration Successful");
-            infoAlert.setHeaderText("Account Created Successfully!");
-            infoAlert.setContentText("Username: " + username + "\nPassword: " + password + "\nRole: " + role + 
-                                   "\n\nYou can now login with these credentials.");
-            infoAlert.showAndWait();
+            // Check if username already exists
+            if (FileManager.userExists(username)) {
+                showError(isNepali ? "प्रयोगकर्ता नाम पहिले नै अवस्थित छ" : "Username already exists");
+                return;
+            }
             
-            clearFields();
-            goBack();
-        } else {
-            showError("Registration failed!");
+            // Create new user
+            User newUser = new User(username, password, fullName, email, phone, role, languages, experience);
+            
+            // Save user
+            if (FileManager.saveUser(newUser)) {
+                showSuccess(isNepali ? "सफलतापूर्वक दर्ता भयो!" : "Registration successful!");
+                
+                // Go back to login after 2 seconds
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(2000);
+                        javafx.application.Platform.runLater(this::goBack);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            } else {
+                showError(isNepali ? "दर्ता असफल" : "Registration failed");
+            }
+            
+        } catch (Exception e) {
+            showError("Registration error: " + e.getMessage());
         }
     }
     
     @FXML
     private void goBack() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+            Parent root = loader.load();
+            
             Stage stage = (Stage) backButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 800, 600));
-        } catch (IOException e) {
-            e.printStackTrace();
+            stage.setScene(new Scene(root));
+        } catch (Exception e) {
+            showError("Error going back: " + e.getMessage());
         }
     }
     
     @FXML
     private void toggleLanguage() {
-        languageManager.toggleLanguage();
+        isNepali = !isNepali;
         updateLanguage();
     }
     
-    private void toggleGuideFields() {
-        boolean isGuide = "Guide".equals(roleComboBox.getValue());
-        languagesField.setVisible(isGuide);
-        experienceField.setVisible(isGuide);
-        languagesLabel.setVisible(isGuide);
-        experienceLabel.setVisible(isGuide);
+    private void updateLanguage() {
+        if (isNepali) {
+            titleLabel.setText("नयाँ प्रयोगकर्ता दर्ता");
+            registerButton.setText("दर्ता");
+            backButton.setText("फिर्ता");
+            languageToggle.setText("English");
+            languagesLabel.setText("भाषाहरू:");
+            experienceLabel.setText("अनुभव:");
+        } else {
+            titleLabel.setText("Register New User");
+            registerButton.setText("Register");
+            backButton.setText("Back");
+            languageToggle.setText("नेपाली");
+            languagesLabel.setText("Languages:");
+            experienceLabel.setText("Experience:");
+        }
     }
     
-    private void hideGuideFields() {
-        languagesField.setVisible(false);
-        experienceField.setVisible(false);
-        languagesLabel.setVisible(false);
-        experienceLabel.setVisible(false);
+    private void updateFieldVisibility() {
+        boolean isGuide = "Guide".equals(roleComboBox.getValue());
+        languagesLabel.setVisible(isGuide);
+        languagesField.setVisible(isGuide);
+        experienceLabel.setVisible(isGuide);
+        experienceField.setVisible(isGuide);
     }
     
     private boolean validateFields() {
         if (usernameField.getText().trim().isEmpty() ||
-            passwordField.getText().isEmpty() ||
+            passwordField.getText().trim().isEmpty() ||
             fullNameField.getText().trim().isEmpty() ||
             emailField.getText().trim().isEmpty() ||
-            phoneField.getText().trim().isEmpty() ||
-            roleComboBox.getValue() == null) {
+            phoneField.getText().trim().isEmpty()) {
             
-            showError("Please fill in all required fields!");
+            showError(isNepali ? "कृपया सबै आवश्यक फिल्डहरू भर्नुहोस्" : "Please fill all required fields");
             return false;
         }
         
-        String username = usernameField.getText().trim();
-        if (username.length() < 3) {
-            showError("Username must be at least 3 characters long!");
+        if ("Guide".equals(roleComboBox.getValue()) && 
+            (languagesField.getText().trim().isEmpty() || experienceField.getText().trim().isEmpty())) {
+            showError(isNepali ? "गाइडका लागि भाषा र अनुभव आवश्यक छ" : "Languages and experience required for guides");
             return false;
-        }
-        
-        String password = passwordField.getText();
-        if (password.length() < 3) {
-            showError("Password must be at least 3 characters long!");
-            return false;
-        }
-        
-        if ("Guide".equals(roleComboBox.getValue())) {
-            if (languagesField.getText().trim().isEmpty() ||
-                experienceField.getText().trim().isEmpty()) {
-                showError("Languages and experience are required for guides!");
-                return false;
-            }
         }
         
         return true;
-    }
-    
-    private void clearFields() {
-        usernameField.clear();
-        passwordField.clear();
-        fullNameField.clear();
-        emailField.clear();
-        phoneField.clear();
-        roleComboBox.setValue(null);
-        languagesField.clear();
-        experienceField.clear();
-        hideGuideFields();
-    }
-    
-    private void updateLanguage() {
-        titleLabel.setText(languageManager.getText("register.title"));
-        registerButton.setText(languageManager.getText("register.button"));
-        backButton.setText(languageManager.getText("back.button"));
-        languageToggle.setText(languageManager.getCurrentLanguage().equals("EN") ? "नेपाली" : "English");
     }
     
     private void showError(String message) {
