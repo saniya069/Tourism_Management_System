@@ -29,6 +29,8 @@ public class LoginController {
     @FXML
     private void initialize() {
         updateLanguage();
+        // Clear error label initially
+        errorLabel.setVisible(false);
     }
     
     @FXML
@@ -41,8 +43,12 @@ public class LoginController {
             return;
         }
         
-        // Check admin credentials
+        // Debug: Print login attempt
+        System.out.println("Login attempt - Username: " + username + ", Password length: " + password.length());
+        
+        // Check admin credentials (plain text comparison for admin)
         if (username.equals("saniya") && password.equals("saniya123")) {
+            System.out.println("Admin login successful");
             openDashboard("admin", username);
             return;
         }
@@ -50,6 +56,7 @@ public class LoginController {
         // Check tourist credentials
         User tourist = FileManager.authenticateUser(username, password, "tourists.txt");
         if (tourist != null) {
+            System.out.println("Tourist login successful");
             openDashboard("tourist", username);
             return;
         }
@@ -57,10 +64,12 @@ public class LoginController {
         // Check guide credentials
         User guide = FileManager.authenticateUser(username, password, "guides.txt");
         if (guide != null) {
+            System.out.println("Guide login successful");
             openDashboard("guide", username);
             return;
         }
         
+        System.out.println("Login failed for username: " + username);
         showError(languageManager.getText("error.invalid.credentials"));
     }
     
@@ -112,11 +121,13 @@ public class LoginController {
             stage.setScene(new Scene(root, 1200, 800));
         } catch (IOException e) {
             e.printStackTrace();
+            showError("Error loading dashboard: " + e.getMessage());
         }
     }
     
     private void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
+        errorLabel.setStyle("-fx-text-fill: red;");
     }
 }
