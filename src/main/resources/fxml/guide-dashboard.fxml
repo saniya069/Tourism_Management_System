@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: linear-gradient(to bottom, #fff3e0, #ffe0b2);" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tourism.controllers.GuideDashboardController">
+   <top>
+      <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #f57c00; -fx-padding: 15;">
+         <children>
+            <Label fx:id="welcomeLabel" style="-fx-text-fill: white;" text="Welcome, Guide!">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="languageToggle" onAction="#toggleLanguage" style="-fx-background-color: #2196f3; -fx-text-fill: white;" text="नेपाली" />
+            <Button fx:id="logoutButton" onAction="#handleLogout" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="Logout" />
+         </children>
+      </HBox>
+   </top>
+   
+   <center>
+      <HBox spacing="20.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         <children>
+            <!-- Left Panel - Profile and Treks -->
+            <VBox spacing="20.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <!-- Profile Section -->
+                  <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                     <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </padding>
+                     <children>
+                        <Label text="Profile Information" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+                        <Label fx:id="earningsLabel" text="Earnings: $0.00" style="-fx-font-size: 14; -fx-text-fill: #2e7d32;" />
+                        <Label fx:id="languagesLabel" text="Languages: " style="-fx-font-size: 14;" />
+                        <Label fx:id="experienceLabel" text="Experience: " style="-fx-font-size: 14;" />
+                     </children>
+                  </VBox>
+                  
+                  <!-- Upcoming Treks -->
+                  <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                     <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </padding>
+                     <children>
+                        <Label text="Upcoming Treks" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+                        
+                        <TableView fx:id="treksTable" prefHeight="300.0">
+                           <columns>
+                              <TableColumn fx:id="touristColumn" prefWidth="150.0" text="Tourist" />
+                              <TableColumn fx:id="trekColumn" prefWidth="200.0" text="Trek" />
+                              <TableColumn fx:id="dateColumn" prefWidth="120.0" text="Date" />
+                              <TableColumn fx:id="difficultyColumn" prefWidth="100.0" text="Difficulty" />
+                           </columns>
+                        </TableView>
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+            
+            <!-- Right Panel - Important Updates -->
+            <VBox spacing="20.0" prefWidth="400.0">
+               <children>
+                  <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                     <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </padding>
+                     <children>
+                        <Label text="Important Updates" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+                        
+                        <TextArea fx:id="updatesArea" editable="false" prefHeight="400.0" wrapText="true" />
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </center>
+</BorderPane>
