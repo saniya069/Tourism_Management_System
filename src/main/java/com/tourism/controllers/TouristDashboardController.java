@@ -42,30 +42,36 @@ public class TouristDashboardController {
     
     public void setCurrentUser(User user) {
         this.currentUser = user;
-        initialize();
+        // Do user-specific initialization here
+        initializeUserData();
     }
     
     @FXML
     private void initialize() {
+        // This will be called automatically by FXML loader
+        // Don't do user-specific initialization here
+        
+        // Initialize table columns
+        bookingIdColumn.setCellValueFactory(new PropertyValueFactory<>("bookingId"));
+        attractionColumn.setCellValueFactory(new PropertyValueFactory<>("attractionName"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        difficultyColumn.setCellValueFactory(new PropertyValueFactory<>("difficulty"));
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        
+        // Set up event handlers
+        attractionComboBox.setOnAction(e -> updatePrice());
+        difficultyComboBox.setOnAction(e -> updatePrice());
+    }
+
+    private void initializeUserData() {
         if (currentUser != null) {
             welcomeLabel.setText("Welcome, " + currentUser.getFullName() + "!");
-            
-            // Initialize table columns
-            bookingIdColumn.setCellValueFactory(new PropertyValueFactory<>("bookingId"));
-            attractionColumn.setCellValueFactory(new PropertyValueFactory<>("attractionName"));
-            dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-            difficultyColumn.setCellValueFactory(new PropertyValueFactory<>("difficulty"));
-            priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-            statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-            
+
             // Load data
             loadAttractions();
             loadDifficulties();
             loadBookings();
-            
-            // Set up event handlers
-            attractionComboBox.setOnAction(e -> updatePrice());
-            difficultyComboBox.setOnAction(e -> updatePrice());
         }
     }
     
